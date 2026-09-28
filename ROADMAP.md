@@ -1,12 +1,45 @@
-# Drei Tage Backend-Projektarbeit
+# Feature-Roadmap: drei Tage Backend-Projektarbeit
 
 ## Ausgangspunkt – bereits geliefert
 
-Die Datenrecherche, Bereinigung, Oberfläche, API-Verträge und Docker-Konfiguration sind erledigt. Die drei Tage beginnen **mit diesem lauffähigen Starter**, nicht mit dem Erstellen des Frontends. Fachliche Abfragen sind in fünf Repository-Dateien als TODOs vorbereitet. Ein eigener Referenzadapter hält die Vorschau benutzbar.
+Die Datenrecherche, Bereinigung, Oberfläche, API-Verträge und Docker-Konfiguration sind erledigt. Die drei Tage beginnen **mit diesem lauffähigen Starter**. Fachliche Abfragen sind in fünf Repository-Dateien als TODOs vorbereitet. Ein eigener Referenzadapter hält die Vorschau benutzbar.
+
+Der Projektstand ist auf GitHub gesichert. Build, sechs API-/Datentests, drei Browser-Tests sowie der gemeinsame Start von Web, API, PostgreSQL und Migrationsdienst wurden geprüft. Die fachlichen Endpunkte liefern derzeit noch gekennzeichnete Referenzdaten.
 
 Ziel der Menschen: Alle fachlichen Endpunkte über PostgreSQL beantworten, Ergebnisse überprüfen und erklären können. Der Lernweg umfasst SELECT, DISTINCT, JOIN, Filter, Sortierung, Pagination, Aggregation und Self-JOIN.
 
-## Tag 1 – Katalog und Ranking (ca. 6 Stunden + Puffer)
+## Welche Funktionen braucht das Frontend?
+
+`App.tsx` lädt beim Öffnen **`/api/countries`, `/api/years` und `/api/meta`**. Erst wenn alle drei Antworten vorliegen, erscheinen die Seiten. Länder- und Jahresliste sind deshalb die ersten SQL-Aufgaben. Insgesamt gibt es sechs fachliche und zwei bereits fertige Metadaten-/Betriebsendpunkte: `/api/meta` liest den Datenbericht; `/api/health` prüft die PostgreSQL-Verbindung.
+
+| Feature-Cluster | Sichtbare Funktion | Benutzte Endpunkte | Backend-Tickets |
+| --- | --- | --- | --- |
+| **A · Startdaten und Auswahl** | Länderlisten und Jahresfilter auf allen Seiten | `GET /api/countries`, `GET /api/years` | T1.1, T1.2 |
+| **B · Überblick und Ranking** | Kennzahlen, Tabelle, Suche, Sortierung, Seitenwechsel, Top 8 | `GET /api/rankings?year=…&q=…&limit=…&offset=…&order=…` | T1.3, T1.4 |
+| **C · Länderverlauf** | Profil, Zeitdiagramm und Wertetabelle eines Landes | `GET /api/countries/:countryId/history` | T2.1 |
+| **D · Ländervergleich** | Zwei Werte und Faktoren im gewählten Jahr; gemeinsames Verlaufsdiagramm | `GET /api/compare?countries=…,…&year=…` **plus zweimal** `GET /api/countries/:countryId/history` | T2.2–T2.4; benötigt C |
+| **E · Veränderungen** | Zu- und Abnahmen, Vergleichsmenge und mittlere Veränderung | `GET /api/insights/trends?from=…&to=…` | T3.1, T3.2 |
+| **F · Abnahme und Betrieb** | Alle Seiten im SQL-Modus, Methodik, Herkunft und Datenbankstatus | Alle sechs fachlichen Endpunkte plus `GET /api/meta` und `GET /api/health` | T3.3–T3.5; Meta und Health sind bereits fertig |
+
+Die Suche in **B** gehört zur Ranking-API. Die Suche in der Tabelle von **E** filtert bereits geladene Ergebnisse im Browser und braucht keinen weiteren Endpunkt. Ein Klick auf ein Land im Ranking oder in den Veränderungen öffnet **C**.
+
+### Fertig-Kriterien je Feature-Cluster
+
+**A · Startdaten und Auswahl (Tag 1, zuerst).** In `catalog.repository.ts` die vorhandenen `source_year`-Werte eindeutig und aufsteigend aus `observations` lesen; `latest` ist das größte vorhandene Jahr. Die Länder aus `countries` mit stabiler ID und alphabetisch sortiertem Namen lesen. Erwartet: 14 Jahre ohne 2013, `latest=2025`, 167 Länder und Eswatini nur einmal. Beide Antworten tragen `meta.source="postgres"`. Bei abgeschaltetem Referenzadapter kann die gesamte Oberfläche erst nach diesem Cluster starten.
+
+**B · Überblick und Ranking (Tag 1).** In `rankings.repository.ts` `observations` mit `countries` verbinden und für das gewählte Jahr vier Teilresultate erzeugen: `rows` als gesuchte und paginierte Tabelle, `total` als Trefferzahl vor Pagination, `leaders` als erste acht Originalränge und `summary` als Kennzahlen **aller** Länder dieses Jahres. `q` sucht ohne Beachtung der Großschreibung nach einem wörtlichen Teilstring; `%` und `_` sind Suchzeichen, keine SQL-Wildcards. `order` kehrt die Anzeige um, die Originalränge bleiben erhalten. Erwartet für 2025: 147 Länder, Finland auf Rang 1 mit 7.764; eine Suche nach Germany ändert `summary.count` nicht; eine Suche ohne Treffer liefert `rows=[]` mit HTTP 200. SQL-Werte parametrisieren und Sortierrichtung nur aus der festen `asc`/`desc`-Auswahl ableiten.
+
+**C · Länderverlauf (Tag 2, vor D).** In `history.repository.ts` die Länder-ID prüfen und die Beobachtungen nach `source_year` aufsteigend lesen. `mapObservation` übernimmt die SQL-Zeile in den API-Vertrag. Erwartet: Germany hat eine echte, lückenhafte Zeitreihe ohne erfundenes 2013; unbekannte ID ergibt 404; fehlende Konfidenzintervalle und Faktoren bleiben `null`. Dieser Endpunkt versorgt auch beide Linien auf der Vergleichsseite.
+
+**D · Ländervergleich (Tag 2).** In `comparison.repository.ts` beide Länder prüfen, ihre Beobachtungen im gewählten Jahr lesen und in der **Anfrage-Reihenfolge** zurückgeben. `scoreDifference` ist erster minus zweiter Score; fehlt einer der beiden Werte, sind dessen Beobachtung und die Differenz `null`. Erwartet: Germany/Finland stimmt mit den Einzelwerten überein; Angola/Germany im Jahr 2025 zeigt die Datenlücke. Faktorwerte stammen unverändert aus `mapObservation`. Zur vollständigen UI-Abnahme zusätzlich die beiden Verlaufsaufrufe aus C prüfen.
+
+**E · Veränderungen (Tag 3).** In `trends.repository.ts` die Beobachtungen zweier Quellenjahre über `country_id` verbinden. Nur Länder mit beiden Werten bilden `rows`; `change = toScore - fromScore`, sortiert nach Veränderung absteigend und bei Gleichstand nach ID. `matchedCountries` zählt die Schnittmenge, `excludedCountries` die übrigen Länder der Vereinigung, `meanChange` mittelt nur die gemeinsamen Länder. Erwartet: Der Zeitraum 2018–2025 liefert die gleichen Zahlen wie die Referenzdaten; Länder mit nur einem Wert fehlen in `rows` und sind in `excludedCountries` erfasst.
+
+**F · Gemeinsame Abnahme (Tag 3, zuletzt).** Jeden ersetzten Endpunkt im Browser und mit direkter SQL-Stichprobe prüfen. Danach `ENABLE_EXERCISE_FIXTURES=false` setzen und `npm run test:acceptance` ausführen: alle sechs fachlichen Endpunkte müssen HTTP 200 und `meta.source="postgres"` liefern. Anschließend frischen Compose-Start, Frontend-/API-Hot-Reload und eine neue additive Migration prüfen. `/api/meta` und `/api/health` bleiben Teil des Smoke-Tests.
+
+**Reihenfolge:** A → B → C → D → E → F. Einzelne fertige Repository-Methoden können schon PostgreSQL verwenden, während andere noch im Referenzmodus laufen. Den globalen Fixture-Schalter erst für F deaktivieren; er prüft dann, ob ein Cluster vergessen wurde.
+
+## Tag 1 – Cluster A und B: Startdaten, Überblick und Ranking (ca. 6 Stunden + Puffer)
 
 | Ticket | Aufgabe | Datei / Schnittstelle | Abnahmekriterium |
 | --- | --- | --- | --- |
@@ -14,13 +47,13 @@ Ziel der Menschen: Alle fachlichen Endpunkte über PostgreSQL beantworten, Ergeb
 | T1.1 · 45 min | Vorhandene Quellenjahre abfragen | `catalog.repository.ts`, `GET /api/years` | DISTINCT, aufsteigend, 2013 fehlt, latest=2025; Antwortquelle postgres |
 | T1.2 · 45 min | Länder abfragen | gleiche Datei, `GET /api/countries` | 167 eindeutige IDs, alphabetisch nach Name; Eswatini nicht doppelt |
 | T1.3 · 2,5 h | Ranking inklusive Filter, Seiten und Kennzahlen | `rankings.repository.ts`, `GET /api/rankings` | Jahr 2025 hat 147 Länder; Finland vorne mit 7.764; Suche ändert nicht die Jahreskennzahlen |
-| T1.4 · 1 h | Fehlerfälle und Sortierung prüfen, Arbeit erklären | API-Tests und Frontend | Leere Suche liefert 200 mit rows=[]; Pagination ohne doppelte Zeilen; Originalrang bleibt erhalten |
+| T1.4 · 1 h | Fehlerfälle und Sortierung prüfen, Arbeit erklären | API-Tests und Frontend | Suche ohne Treffer liefert 200 mit rows=[]; Pagination ohne doppelte Zeilen; Originalrang bleibt erhalten |
 
 **Fachliche Entscheidungen:** Originalränge verwenden. `order=desc` bedeutet höchster Score zuerst bzw. Originalrang aufsteigend. Score-Gleichstände nicht eigenständig neu ordnen. `total` zählt Suchtreffer, `summary` und `leaders` beziehen sich auf alle Länder des Jahres. Platzhalter für SQL-Werte nutzen; Suchzeichen `%` und `_` bei ILIKE als wörtliche Zeichen behandeln.
 
 **Tagesergebnis:** Katalog und Ranking sind über echte SQL-Abfragen vollständig mit dem Frontend verbunden.
 
-## Tag 2 – Länderverlauf und Vergleich (ca. 6 Stunden + Puffer)
+## Tag 2 – Cluster C und D: Länderverlauf und Vergleich (ca. 6 Stunden + Puffer)
 
 | Ticket | Aufgabe | Datei / Schnittstelle | Abnahmekriterium |
 | --- | --- | --- | --- |
@@ -33,7 +66,7 @@ Ziel der Menschen: Alle fachlichen Endpunkte über PostgreSQL beantworten, Ergeb
 
 **Tagesergebnis:** Länderprofile, Zeitreihen und Zweiländervergleich verwenden PostgreSQL.
 
-## Tag 3 – Veränderungen, Abnahme und Präsentation (ca. 6 Stunden + Puffer)
+## Tag 3 – Cluster E und F: Veränderungen, Abnahme und Präsentation (ca. 6 Stunden + Puffer)
 
 | Ticket | Aufgabe | Datei / Schnittstelle | Abnahmekriterium |
 | --- | --- | --- | --- |
