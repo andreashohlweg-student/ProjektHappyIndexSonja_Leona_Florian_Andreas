@@ -17,6 +17,8 @@ docker compose up --build
 | http://localhost:5173 | Webseite |
 | http://localhost:3001/api/health | API und tatsächlicher Datenbankstatus |
 | http://localhost:3001/api/meta | Herkunft, Datenabdeckung und Bereinigung |
+| http://localhost:3001/api/docs | Interaktive Swagger-Dokumentation mit Beispielen und „Try it out“ |
+| http://localhost:3001/api/openapi.json | Maschinenlesbarer OpenAPI-Vertrag |
 | localhost:5432 | PostgreSQL, Datenbank/User: `happiness`, lokales Passwort: `happiness_local` |
 
 Die vier Dienste sind `web`, `api`, `db`, `migrations`. Bei belegten Ports `.env.example` als `.env` kopieren und `WEB_PORT`, `API_PORT` oder `DB_PORT` ändern. Die internen Verbindungen bleiben unverändert. Eine Änderung von `POSTGRES_PASSWORD` nach der Erstinitialisierung ändert ein bestehendes Datenbankpasswort nicht automatisch.
@@ -30,6 +32,12 @@ Die vier Dienste sind `web`, `api`, `db`, `migrations`. Bei belegten Ports `.env
 Die UI kennzeichnet jede entsprechende Antwort als **„Übungsmodus · Referenzdaten“**. Das Frontend importiert keine Forschungsdaten und ruft ausschließlich `/api/...` auf. Nach Umsetzung eines Repositorys erhält dessen Antwort `source: 'postgres'`; die UI zeigt dann automatisch „PostgreSQL“.
 
 **Beginnt mit [ROADMAP.md](ROADMAP.md).** Die API-Verträge stehen in [docs/API.md](docs/API.md), die Typen in `packages/contracts/src/index.ts`.
+
+### Frontend und Backend im Swagger-Vertrag abgleichen
+
+Unter **http://localhost:3001/api/docs** zeigt Swagger UI alle acht GET-Endpunkte. Zu jedem fachlichen Endpunkt stehen dort die Frontend-Funktion, benötigte Parameter, Antwortfelder, Datenlücken und Fehlerfälle. Mit „Try it out“ lassen sich Aufrufe gegen die laufende API testen. Dieselbe Oberfläche ist über den Web-Proxy unter **http://localhost:5173/api/docs** erreichbar.
+
+Die bearbeitbare Spezifikation liegt in [`apps/api/src/http/openapi.yaml`](apps/api/src/http/openapi.yaml). Zusätzlich liefert `/api/openapi.yaml` die Rohdatei. Bei Änderungen am Antwortformat müssen OpenAPI-Datei und TypeScript-Verträge in `packages/contracts/src/index.ts` gemeinsam aktualisiert werden. Der Swagger-Vertrag beschreibt auch den derzeitigen Referenzmodus; nach Umsetzung einer SQL-Aufgabe wechselt `meta.source` für deren Antwort auf `postgres`.
 
 ## Hot Reload und SQL-Änderungen
 

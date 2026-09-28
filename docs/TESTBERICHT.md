@@ -54,3 +54,13 @@ Auf macOS mit Docker 29.8.0, Compose v5.5.1 und Node 24.18.0 wurden folgende Pr�
 Der erste Compose-Start deckte zwei Konfigurationsfehler auf: Das Migrationsskript wurde als CommonJS statt als ES-Modul geladen, und Vite konnte seine temporäre Konfigurationsdatei im Container nicht schreiben. `package.json` deklariert das Root-Paket jetzt als ES-Modul; das Dockerfile gibt dem nicht privilegierten `node`-Benutzer Schreibzugriff auf das Web-Verzeichnis. Nach dem erneuten Build liefen beide Dienste erfolgreich.
 
 Ein laufender Hot-Reload nach Dateiänderungen und die Reaktion auf eine nachträglich hinzugefügte Migration wurden bei dieser Prüfung nicht getestet.
+
+## Swagger-Erweiterung (28.09.2026)
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| OpenAPI-Validierung | OpenAPI 3.0.3 ist formal gültig und beschreibt alle acht vorhandenen GET-Endpunkte |
+| `npm run build` und `npm test` | Build erfolgreich; 7 Tests bestanden, einschließlich Spezifikation und Auslieferung |
+| `docker compose up --build -d` | Alle vier Dienste laufen; `db` und `api` healthy |
+| Swagger über API und Web-Proxy | `/api/docs/` und die lokalen CSS-Dateien liefern HTTP 200; `/api/openapi.json` enthält acht Pfade |
+| `npm run test:e2e` | 4 Tests bestanden; Swagger zeigt acht Operationen und „Try it out“ für `/years` liefert HTTP 200 |

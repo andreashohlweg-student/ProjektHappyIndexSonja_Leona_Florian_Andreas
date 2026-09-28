@@ -1,12 +1,17 @@
 import express from 'express';
 import type { ErrorRequestHandler } from 'express';
+import swaggerUi from 'swagger-ui-express';
 import { routes } from './http/routes.js';
+import { openApiDocument, openApiSource } from './http/openapi.js';
 import { HttpError } from './errors.js';
 import { pool } from './db/pool.js';
 import { metadata } from './fixtures/reference-data.js';
 export const app=express();
 app.disable('x-powered-by');
 app.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next();});
+app.get('/api/openapi.json',(_req,res)=>res.json(openApiDocument));
+app.get('/api/openapi.yaml',(_req,res)=>res.type('application/yaml').send(openApiSource));
+app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(openApiDocument,{customSiteTitle:'Happiness Atlas API'}));
 app.get('/api/health',async (_req,res)=>{
   try {
     const result=await pool.query('SELECT ready FROM bootstrap_status WHERE id = 1');

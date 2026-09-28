@@ -80,7 +80,7 @@ Die Suche in **B** gehört zur Ranking-API. Die Suche in der Tabelle von **E** f
 
 ## Arbeitsablauf pro Ticket
 
-1. Ticket und API-Vertrag lesen; erwartetes Ergebnis in der Oberfläche ansehen.
+1. Ticket und API-Vertrag in `/api/docs` lesen; erwartetes Ergebnis in der Oberfläche ansehen.
 2. Abfrage zunächst in `psql` oder einem SQL-Client entwickeln.
 3. Im zugehörigen Repository die `useFixture(...)`-Rückgabe durch die Abfrage ersetzen.
 4. Mit dem vorbereiteten Mapper aus SQL-Zeilen API-Objekte machen; `{data, source:'postgres'}` zurückgeben.

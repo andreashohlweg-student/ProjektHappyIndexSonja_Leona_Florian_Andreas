@@ -1,5 +1,7 @@
 # API-Vertrag v1
 
+Interaktiv im laufenden Projekt: **http://localhost:3001/api/docs**. Die bearbeitbare OpenAPI-3.0-Datei liegt unter [`apps/api/src/http/openapi.yaml`](../apps/api/src/http/openapi.yaml); die API liefert sie auch als `/api/openapi.yaml` und `/api/openapi.json`. Die gemeinsamen TypeScript-Typen bleiben unter `packages/contracts/src/index.ts`.
+
 Basis: `/api`. Nur GET. Browserzugriff über den Vite-Proxy (gleiche Origin); keine CORS-Konfiguration nötig. Länder-IDs kommen aus `/countries`, nicht aus frei geschriebenen Ländernamen. Beispiel: `germany`, `finland`, `cote-divoire`.
 
 ## Einheitliche Antworten

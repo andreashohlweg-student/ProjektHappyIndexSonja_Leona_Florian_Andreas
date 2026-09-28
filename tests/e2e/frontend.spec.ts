@@ -42,3 +42,14 @@ test('Fehler und leere Ergebnisse bleiben bedienbar',async({page})=>{
   await expect(page.getByRole('alert')).toHaveCount(0);
   await expect(page.getByText('1–15 von 147 Ländern')).toBeVisible();
 });
+test('Swagger zeigt den Frontend-Vertrag und führt einen Beispielaufruf aus',async({page})=>{
+  await page.goto('/api/docs/');
+  await expect(page.getByText('Happiness Atlas API',{exact:false}).first()).toBeVisible();
+  await expect(page.locator('.opblock')).toHaveCount(8);
+  const years=page.locator('.opblock').filter({hasText:'/years'}).first();
+  await years.locator('.opblock-summary').click();
+  await years.getByRole('button',{name:'Try it out'}).click();
+  await years.getByRole('button',{name:'Execute'}).click();
+  await expect(years.locator('.live-responses-table')).toContainText('200');
+  await expect(years.locator('.live-responses-table')).toContainText('2025');
+});
