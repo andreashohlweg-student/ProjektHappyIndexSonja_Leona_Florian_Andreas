@@ -1,0 +1,66 @@
+name: happiness-lab
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: happiness
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-happiness_local}
+      POSTGRES_DB: happiness
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U happiness -d happiness && psql -U happiness -d happiness -tAc 'SELECT ready FROM bootstrap_status WHERE id = 1' | grep -q t"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
+  api:
+    build: .
+    command: npm run dev:api
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://happiness:${POSTGRES_PASSWORD:-happiness_local}@db:5432/happiness
+      ENABLE_EXERCISE_FIXTURES: ${ENABLE_EXERCISE_FIXTURES:-true}
+    ports:
+      - "127.0.0.1:${API_PORT:-3001}:3001"
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./packages/contracts:/app/packages/contracts
+      - ./data/clean:/app/data/clean:ro
+    depends_on:
+      db: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  web:
+    build: .
+    command: npm run dev:web
+    environment:
+      API_PROXY_TARGET: http://api:3001
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "127.0.0.1:${WEB_PORT:-5173}:5173"
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+      - ./apps/web/index.html:/app/apps/web/index.html
+      - ./apps/web/vite.config.ts:/app/apps/web/vite.config.ts
+      - ./packages/contracts:/app/packages/contracts
+    depends_on:
+      api: {condition: service_healthy}
+  migrations:
+    build: .
+    command: npm run db:watch
+    environment:
+      DATABASE_URL: postgresql://happiness:${POSTGRES_PASSWORD:-happiness_local}@db:5432/happiness
+    volumes:
+      - ./db/migrations:/app/db/migrations:ro
+      - ./scripts:/app/scripts:ro
+    depends_on:
+      db: {condition: service_healthy}
+volumes:
+  postgres_data:

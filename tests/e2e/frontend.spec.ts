@@ -1,0 +1,44 @@
+import {test,expect} from '@playwright/test';
+test('Ranking, Suche, Verlauf, Vergleich, Zeitfilter und Methodik',async({page})=>{
+  const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');
+  await expect(page.getByRole('heading',{name:'Wie glücklich ist die Welt?'})).toBeVisible();
+  await expect(page.getByRole('cell',{name:'7,764',exact:true})).toBeVisible();
+  await page.screenshot({path:'test-results/overview-desktop.png',fullPage:true});
+  await page.getByLabel('Land im Ranking suchen').fill('Germany');
+  await expect(page.getByText('1–1 von 1 Ländern')).toBeVisible();
+  await page.getByRole('button',{name:'Zeitverlauf Germany'}).click();
+  await expect(page.getByRole('heading',{name:'Ein Land. Viele Zeitstände.'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Die Werte hinter dem Diagramm'})).toBeVisible();
+  await page.screenshot({path:'test-results/history-desktop.png',fullPage:true});
+  await page.getByRole('link',{name:'Ländervergleich',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Welche Faktoren zeigt die Quelle?'})).toBeVisible();
+  await page.getByLabel('Erstes Land',{exact:true}).selectOption('angola');
+  await expect(page.getByText('Kein Wert für 2025')).toBeVisible();
+  await page.getByRole('link',{name:'Veränderungen',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Alle Veränderungen'})).toBeVisible();
+  await page.getByLabel('Von Quellenjahr').selectOption('2014');
+  await expect(page.getByText('2014–2025',{exact:true})).toBeVisible();
+  await page.getByRole('link',{name:'Daten & Methodik',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Die Basis jeder Aussage.'})).toBeVisible();
+  expect(errors).toEqual([]);
+});
+test('Smartphone: Navigation, Tabelle und Bedienelemente ohne Seitenüberlauf',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await page.goto('/');
+  await expect(page.getByRole('cell',{name:'7,764',exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBeTruthy();
+  await page.screenshot({path:'test-results/overview-mobile.png',fullPage:true});
+});
+test('Fehler und leere Ergebnisse bleiben bedienbar',async({page})=>{
+  await page.goto('/');await expect(page.getByRole('cell',{name:'7,764',exact:true})).toBeVisible();
+  await page.getByLabel('Land im Ranking suchen').fill('xyz-no-country');
+  await expect(page.getByText('Kein Land zu „xyz-no-country“ gefunden.')).toBeVisible();
+  await page.getByLabel('Land im Ranking suchen').fill('');
+  await expect(page.getByRole('cell',{name:'7,764',exact:true})).toBeVisible();
+  await page.route('**/api/rankings?**',route=>route.fulfill({status:501,contentType:'application/json',body:JSON.stringify({error:{code:'NOT_IMPLEMENTED',message:'Ranking noch offen'}})}));
+  await page.getByLabel('Quellenjahr',{exact:true}).selectOption('2024');
+  await expect(page.getByRole('alert')).toContainText('Ranking noch offen');
+  await page.unroute('**/api/rankings?**');await page.getByRole('button',{name:'Erneut versuchen'}).click();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await expect(page.getByText('1–15 von 147 Ländern')).toBeVisible();
+});
