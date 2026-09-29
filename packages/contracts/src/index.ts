@@ -11,7 +11,7 @@ export interface Observation {
   year: number; rank: number; score: number; lower: number | null; upper: number | null;
   factors: Record<FactorKey, number | null>;
 }
-export type DataSource = 'reference-data' | 'postgres';
+export type DataSource = 'source-file' | 'postgres';
 export interface RepositoryResult<T> { data: T; source: DataSource }
 export interface ApiResponse<T> { data: T; meta: { source: DataSource; sourceReportYear: 2026; yearKind: 'source-year' } }
 export interface ApiError { error: { code: string; message: string } }

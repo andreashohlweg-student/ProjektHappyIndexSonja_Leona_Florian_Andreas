@@ -73,6 +73,6 @@ Die Faktorbeiträge entstehen aus einem statistischen Modell. Sie werden über J
 
 ## Reproduzierbarkeit
 
-`python3 scripts/prepare_data.py` verarbeitet den gebündelten Snapshot offline. Das Ergebnis erzeugt sowohl Referenzadapter-Daten als auch SQL-Seeds aus derselben Quelle. Tests importieren beide SQL-Dateien in die PostgreSQL-Engine PGlite und vergleichen alle 2.116 Zeilen mit den JSON-Daten.
+`python3 scripts/prepare_data.py` verarbeitet den gebündelten Snapshot offline. Das Ergebnis erzeugt JSON-Testdaten und SQL-Seeds aus derselben Quelle. Tests importieren beide SQL-Dateien in die PostgreSQL-Engine PGlite und vergleichen alle 2.116 Zeilen mit den JSON-Daten.
 
 Die SQL-Dateien sind für die Erstinitialisierung einer leeren Datenbank gedacht. Sie laufen nicht bei jedem Container-Neustart. Für die geplanten Leseabfragen müsst ihr das Schema nicht ändern. Wer später Tabellen oder Daten dauerhaft umstellen will, braucht dafür einen eigenen, bewussten Schritt; ein lokaler Reset löscht zuvor gespeicherte Änderungen.

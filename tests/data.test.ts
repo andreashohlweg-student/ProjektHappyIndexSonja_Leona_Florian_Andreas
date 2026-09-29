@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {PGlite} from '@electric-sql/pglite';
-import {countries,metadata,observations} from '../apps/api/src/fixtures/reference-data.js';
+import {countries,metadata,observations} from '../tests/expected-data.js';
 import {mapObservation,type ObservationRow} from '../apps/api/src/db/map-observation.js';
 
 test('Datenherkunft und Erhaltung: Hash, Lücke, Alias, fehlende und negative Werte',()=>{

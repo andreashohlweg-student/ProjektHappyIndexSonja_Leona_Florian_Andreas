@@ -6,7 +6,7 @@ Basis: `/api`. Nur GET. Browserzugriff über den Vite-Proxy (gleiche Origin); ke
 
 ## Einheitliche Antworten
 
-Erfolg: `{ "data": <fachliches Objekt>, "meta": { "source": "reference-data" | "postgres", "sourceReportYear": 2026, "yearKind": "source-year" } }`.
+Erfolg: `{ "data": <fachliches Objekt>, "meta": { "source": "source-file" | "postgres", "sourceReportYear": 2026, "yearKind": "source-year" } }`.
 
 Fehler: `{ "error": { "code": "...", "message": "..." } }`.
 
@@ -34,7 +34,7 @@ JSON-Zahlen sind Zahlen, niemals Dezimalstrings. Fehlende Messwerte sind `null`;
 | `/compare` | `countries=id1,id2`, exakt zwei unterschiedliche IDs; `year` Pflicht | `{year,countries:[Country,Country],observations:[Observation\|null,Observation\|null],scoreDifference:number\|null}` |
 | `/insights/trends` | `from`, `to`, vorhandene Quellenjahre mit from < to | `{from,to,rows:TrendRow[],matchedCountries,excludedCountries,meanChange}` |
 | `/meta` | keine | Datenbericht aus `data/clean/metadata.json`; fertig, kein Lernticket |
-| `/health` | keine | Eigenes Gesundheitsformat: `{status:"ok",database:"ready",exerciseFixtures:boolean}`; 503 bei DB-/Importproblem |
+| `/health` | keine | Eigenes Gesundheitsformat: `{status:"ok",database:"ready"}`; 503 bei DB-/Importproblem |
 
 `TrendRow = {countryId,countryName,fromScore,toScore,change}`.
 
@@ -62,7 +62,7 @@ JSON-Zahlen sind Zahlen, niemals Dezimalstrings. Fehlende Messwerte sind `null`;
 | 400 | INVALID_QUERY / INVALID_RANGE / INVALID_COUNTRY | Fehlender, mehrfacher oder ungültiger Parameter; identische Vergleichsländer; from >= to |
 | 404 | COUNTRY_NOT_FOUND / NOT_FOUND | Unbekannte Länder-ID oder unbekannter Endpunkt |
 | 422 | UNAVAILABLE_YEAR | Gültige Ganzzahl, aber im Snapshot nicht enthalten; z. B. 2013 |
-| 501 | NOT_IMPLEMENTED | Offenes Repository bei ENABLE_EXERCISE_FIXTURES=false |
+| 501 | NOT_IMPLEMENTED | Offenes Repository |
 | 500 | INTERNAL_ERROR | Unerwarteter Fehler; keine SQL-Details an Browser |
 | 503 | eigenes Health-Format | PostgreSQL nicht erreichbar oder Erstimport unvollständig |
 
@@ -75,4 +75,4 @@ JSON-Zahlen sind Zahlen, niemals Dezimalstrings. Fehlende Messwerte sind `null`;
 - `/api/compare?countries=angola,germany&year=2025` (Datenlücke)
 - `/api/insights/trends?from=2018&to=2025`
 
-Die Browseroberfläche benutzt alle sechs fachlichen Endpunkte. `/meta` liefert statische Herkunftsinformationen und bleibt unabhängig von der Backend-Übung. Die SQL-Verbindung wird bereits in `/health` tatsächlich genutzt.
+Die geplanten Fachansichten sollen die sechs fachlichen Endpunkte benutzen. Derzeit zeigt das Frontend nur die Startseite. `/meta` liefert statische Herkunftsinformationen und bleibt unabhängig von der Backend-Übung. Die SQL-Verbindung wird bereits in `/health` tatsächlich genutzt.

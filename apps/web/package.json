@@ -9,7 +9,6 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@happiness/contracts": "*",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

@@ -1,5 +1,5 @@
 import { HttpError } from '../errors.js';
-import { metadata } from '../fixtures/reference-data.js';
+import { metadata } from '../data/metadata.js';
 export function text(value: unknown, name: string, fallback?: string): string {
   if (value === undefined && fallback !== undefined) return fallback;
   if (typeof value !== 'string') throw new HttpError(400,'INVALID_QUERY',`${name} muss genau einmal angegeben werden.`);

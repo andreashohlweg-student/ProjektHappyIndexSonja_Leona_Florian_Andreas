@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import {isDeepStrictEqual} from 'node:util';
-import {countries,metadata,rankingFixture,historyFixture,comparisonFixture,trendsFixture} from '../apps/api/src/fixtures/reference-data.js';
+import {countries,metadata,expectedRanking,expectedHistory,expectedComparison,expectedTrends} from '../tests/expected-data.js';
 const base=process.env.TEST_BASE_URL ?? 'http://localhost:3001';
 function equivalent(actual:unknown,expected:unknown,path='data'):void {
   if(typeof actual==='number'&&typeof expected==='number') {
@@ -24,14 +24,14 @@ function equivalent(actual:unknown,expected:unknown,path='data'):void {
 const cases:[string,unknown][]=[
   ['/years',{years:metadata.years,latest:2025}],
   ['/countries',{countries}],
-  ['/rankings?year=2025&limit=15&offset=0&order=desc',rankingFixture({year:2025,limit:15,offset:0,order:'desc',q:''})],
-  ['/rankings?year=2018&limit=20&offset=0&order=asc&q=germany',rankingFixture({year:2018,limit:20,offset:0,order:'asc',q:'germany'})],
-  ['/rankings?year=2025&limit=20&offset=0&q=%25',rankingFixture({year:2025,limit:20,offset:0,order:'desc',q:'%'})],
-  ['/countries/eswatini/history',historyFixture('eswatini')],
-  ['/countries/germany/history',historyFixture('germany')],
-  ['/compare?countries=germany,finland&year=2025',comparisonFixture(['germany','finland'],2025)],
-  ['/compare?countries=angola,germany&year=2025',comparisonFixture(['angola','germany'],2025)],
-  ['/insights/trends?from=2018&to=2025',trendsFixture(2018,2025)],
+  ['/rankings?year=2025&limit=15&offset=0&order=desc',expectedRanking({year:2025,limit:15,offset:0,order:'desc',q:''})],
+  ['/rankings?year=2018&limit=20&offset=0&order=asc&q=germany',expectedRanking({year:2018,limit:20,offset:0,order:'asc',q:'germany'})],
+  ['/rankings?year=2025&limit=20&offset=0&q=%25',expectedRanking({year:2025,limit:20,offset:0,order:'desc',q:'%'})],
+  ['/countries/eswatini/history',expectedHistory('eswatini')],
+  ['/countries/germany/history',expectedHistory('germany')],
+  ['/compare?countries=germany,finland&year=2025',expectedComparison(['germany','finland'],2025)],
+  ['/compare?countries=angola,germany&year=2025',expectedComparison(['angola','germany'],2025)],
+  ['/insights/trends?from=2018&to=2025',expectedTrends(2018,2025)],
 ];
 let failed=0;
 for(const [path,expected] of cases) {
@@ -39,7 +39,7 @@ for(const [path,expected] of cases) {
     const response=await fetch(`${base}/api${path}`);
     const body=await response.json();
     assert.equal(response.status,200,JSON.stringify(body));
-    assert.equal(body.meta.source,'postgres','Endpunkt benutzt noch den Referenzadapter');
+    assert.equal(body.meta.source,'postgres','Endpunkt muss aus PostgreSQL antworten');
     // PostgreSQL-Collation darf den Alphabetvergleich akzentuierter Namen anders sortieren.
     if(path==='/countries') {body.data.countries.sort((a:{id:string},b:{id:string})=>a.id.localeCompare(b.id));(expected as {countries:typeof countries}).countries=[...countries].sort((a,b)=>a.id.localeCompare(b.id));}
     equivalent(body.data,expected);console.log(`PASS ${path}`);

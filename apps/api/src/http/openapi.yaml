@@ -3,10 +3,10 @@ info:
   title: Happiness Atlas API
   version: 1.0.0
   description: |
-    Vertrag zwischen dem vorbereiteten Frontend und dem Backend-Lernprojekt.
-    Alle fachlichen Antworten haben `data` und `meta`. `meta.source=reference-data`
-    kennzeichnet die Vorschau aus JSON; `meta.source=postgres` darf nur bei einer
-    tatsächlich ausgeführten PostgreSQL-Abfrage verwendet werden.
+    Vertrag für die geplanten Fachansichten und das Backend-Lernprojekt.
+    Offene Fachendpunkte antworten mit HTTP 501. Nach der Implementierung haben
+    fachliche Antworten `data` und `meta`; `meta.source=postgres` steht für
+    tatsächlich ausgeführte PostgreSQL-Abfragen.
 
     Die sechs fachlichen GET-Endpunkte werden in den Repository-Dateien umgesetzt.
     `GET /meta` und `GET /health` sind bereits fertig. Ein Jahr bezeichnet die
@@ -16,7 +16,7 @@ servers:
     description: API auf demselben Host; funktioniert auch über den Vite-Proxy
 tags:
   - name: Startdaten
-    description: Das Frontend lädt Länder und Jahre vor jeder Seite.
+    description: Länder und Jahre für die geplanten Fachansichten.
   - name: Überblick
     description: Ranking, Suche, Seiten und Kennzahlen.
   - name: Länderverlauf
@@ -48,7 +48,7 @@ paths:
                 data:
                   years: [2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
                   latest: 2025
-                meta: {source: reference-data, sourceReportYear: 2026, yearKind: source-year}
+                meta: {source: postgres, sourceReportYear: 2026, yearKind: source-year}
         '501': {$ref: '#/components/responses/NotImplemented'}
         '500': {$ref: '#/components/responses/InternalError'}
   /countries:
@@ -71,7 +71,7 @@ paths:
                   countries:
                     - {id: afghanistan, name: Afghanistan}
                     - {id: albania, name: Albania}
-                meta: {source: reference-data, sourceReportYear: 2026, yearKind: source-year}
+                meta: {source: postgres, sourceReportYear: 2026, yearKind: source-year}
         '501': {$ref: '#/components/responses/NotImplemented'}
         '500': {$ref: '#/components/responses/InternalError'}
   /rankings:
@@ -132,7 +132,7 @@ paths:
       operationId: compareCountries
       summary: Zwei Länder in einem Quellenjahr vergleichen
       description: |
-        Die Vergleichsseite zeigt Scores, Ränge, Faktorwerte und die Differenz.
+        Eine spätere Vergleichsansicht kann Scores, Ränge, Faktorwerte und die Differenz zeigen.
         Für das gemeinsame Verlaufsdiagramm ruft sie zusätzlich zweimal
         `/countries/{countryId}/history` auf. Backend-Aufgabe T2.2: beide Länder
         prüfen und die Antwort in der Reihenfolge des Parameters `countries`
@@ -159,7 +159,7 @@ paths:
       operationId: getTrends
       summary: Veränderungen zwischen zwei Quellenjahren
       description: |
-        Die Veränderungen-Seite benötigt sortierte Länderwerte, die Größe der
+        Eine spätere Veränderungen-Ansicht benötigt sortierte Länderwerte, die Größe der
         Vergleichsmenge und ihre mittlere Veränderung. Backend-Aufgabe T3.1/T3.2:
         Beobachtungen über `country_id` verbinden. `rows` enthält nur Länder mit
         beiden Werten; `change=toScore-fromScore`. `matchedCountries` zählt die
@@ -185,10 +185,8 @@ paths:
       operationId: getMetadata
       summary: Herkunft und Aufbereitung des Datensatzes
       description: |
-        Die Seite „Daten & Methodik“ und `App.tsx` laden diese Daten. Der Endpunkt
-        liest bereits `data/clean/metadata.json`; hierfür ist keine SQL-Aufgabe
-        offen. `meta.source` bleibt hier `reference-data`, weil diese Metadaten
-        aus der Datei kommen.
+        Der Endpunkt liest bereits `data/clean/metadata.json`; hierfür ist keine
+        SQL-Aufgabe offen. `meta.source` ist `source-file`.
       responses:
         '200':
           description: Vollständiger Datenbericht für die Methodikseite.
@@ -209,7 +207,7 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/HealthReady'}
-              example: {status: ok, database: ready, exerciseFixtures: true}
+              example: {status: ok, database: ready}
         '503':
           description: Datenbank nicht erreichbar oder Import unvollständig.
           content:
@@ -297,8 +295,7 @@ components:
           example: {error: {code: COUNTRY_NOT_FOUND, message: 'Dieses Land ist nicht im Datensatz vorhanden.'}}
     NotImplemented:
       description: |
-        Fachliche Repository-Methode ist noch offen und
-        `ENABLE_EXERCISE_FIXTURES=false` deaktiviert den Referenzadapter.
+        Fachliche Repository-Methode ist noch offen.
       content:
         application/json:
           schema: {$ref: '#/components/schemas/ErrorResponse'}
@@ -316,7 +313,7 @@ components:
       properties:
         source:
           type: string
-          enum: [reference-data, postgres]
+          enum: [source-file, postgres]
           description: '`postgres` nur für eine tatsächlich aus PostgreSQL erzeugte Antwort.'
         sourceReportYear: {type: integer, enum: [2026]}
         yearKind: {type: string, enum: [source-year]}
@@ -494,11 +491,10 @@ components:
             message: {type: string, description: Lesbare Fehlermeldung für die Oberfläche.}
     HealthReady:
       type: object
-      required: [status, database, exerciseFixtures]
+      required: [status, database]
       properties:
         status: {type: string, enum: [ok]}
         database: {type: string, enum: [ready]}
-        exerciseFixtures: {type: boolean}
     HealthDegraded:
       type: object
       required: [status, database]

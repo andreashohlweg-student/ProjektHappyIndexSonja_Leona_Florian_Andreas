@@ -23,7 +23,6 @@ services:
     environment:
       PORT: 3001
       DATABASE_URL: postgresql://happiness:${POSTGRES_PASSWORD:-happiness_local}@db:5432/happiness
-      ENABLE_EXERCISE_FIXTURES: ${ENABLE_EXERCISE_FIXTURES:-true}
     ports:
       - "127.0.0.1:${API_PORT:-3001}:3001"
     volumes:
