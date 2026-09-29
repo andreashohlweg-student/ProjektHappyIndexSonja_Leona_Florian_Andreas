@@ -14,11 +14,11 @@ Die Datenbank legt beim ersten Start `countries` und `observations` an und lädt
 
 ## Was ihr selbst baut
 
-- Express-Routen und ihre Antwortformate
-- SQL-Abfragen und Verbindung der Routen mit PostgreSQL
+- Weitere Express-Routen und ihre Antwortformate
+- SQL-Abfragen in den Repository-Dateien
 - Frontend-Ansichten und API-Aufrufe
 
-Im Backend sind App, Server und PostgreSQL-Konfiguration vorbereitet. Es gibt noch keine fachlichen Routen, keine Validierung, keine Swagger-Oberfläche und keine fertige Verbindung vom Frontend bis zur Datenbank.
+Als Muster ist `GET /countries` mit Router, Controller, Fehler-Middleware und einer offenen Repository-Methode vorbereitet. Die SQL-Abfrage in `backend/src/countries/countries.repository.ts` schreibt ihr selbst. Das Frontend ruft den Endpunkt noch nicht auf.
 
 ```sh
 docker compose down
