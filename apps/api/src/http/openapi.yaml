@@ -202,7 +202,7 @@ paths:
       summary: Datenbank und Erstimport prüfen
       description: |
         Eigener Antworttyp ohne `data`/`meta`. Der Endpunkt führt bereits eine
-        PostgreSQL-Abfrage gegen `bootstrap_status` aus.
+        PostgreSQL-Abfrage gegen `observations` aus und prüft, ob Daten vorhanden sind.
       responses:
         '200':
           description: Datenbank erreichbar und Import abgeschlossen.

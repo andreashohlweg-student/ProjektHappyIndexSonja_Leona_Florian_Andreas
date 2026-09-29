@@ -14,7 +14,7 @@ app.get('/api/openapi.yaml',(_req,res)=>res.type('application/yaml').send(openAp
 app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(openApiDocument,{customSiteTitle:'Happiness Atlas API'}));
 app.get('/api/health',async (_req,res)=>{
   try {
-    const result=await pool.query('SELECT ready FROM bootstrap_status WHERE id = 1');
+    const result=await pool.query('SELECT EXISTS (SELECT 1 FROM observations) AS ready');
     if (!result.rows[0]?.ready) throw new Error('Import incomplete');
     res.json({status:'ok',database:'ready',exerciseFixtures:process.env.ENABLE_EXERCISE_FIXTURES !== 'false'});
   } catch {

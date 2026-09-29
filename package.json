@@ -19,8 +19,6 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "test:acceptance": "node --import tsx scripts/acceptance.ts",
     "test:e2e": "playwright test",
-    "db:migrate": "node --import tsx scripts/migrate.ts",
-    "db:watch": "nodemon -L --watch db/migrations --ext sql --delay 1 --exec 'npm run db:migrate'",
     "data:prepare": "python3 scripts/prepare_data.py",
     "data:download": "python3 scripts/prepare_data.py --download"
   },

@@ -4,7 +4,7 @@
 
 Die Datenrecherche, Bereinigung, Oberfläche, API-Verträge und Docker-Konfiguration sind erledigt. Die drei Tage beginnen **mit diesem lauffähigen Starter**. Fachliche Abfragen sind in fünf Repository-Dateien als TODOs vorbereitet. Ein eigener Referenzadapter hält die Vorschau benutzbar.
 
-Der Projektstand ist auf GitHub gesichert. Build, sechs API-/Datentests, drei Browser-Tests sowie der gemeinsame Start von Web, API, PostgreSQL und Migrationsdienst wurden geprüft. Die fachlichen Endpunkte liefern derzeit noch gekennzeichnete Referenzdaten.
+Der Projektstand ist auf GitHub gesichert. Build, API-/Datentests, Browser-Tests und der gemeinsame Start von Web, API und PostgreSQL wurden geprüft. Die fachlichen Endpunkte liefern derzeit noch gekennzeichnete Referenzdaten.
 
 Ziel der Menschen: Alle fachlichen Endpunkte über PostgreSQL beantworten, Ergebnisse überprüfen und erklären können. Der Lernweg umfasst SELECT, DISTINCT, JOIN, Filter, Sortierung, Pagination, Aggregation und Self-JOIN.
 
@@ -35,7 +35,7 @@ Die Suche in **B** gehört zur Ranking-API. Die Suche in der Tabelle von **E** f
 
 **E · Veränderungen (Tag 3).** In `trends.repository.ts` die Beobachtungen zweier Quellenjahre über `country_id` verbinden. Nur Länder mit beiden Werten bilden `rows`; `change = toScore - fromScore`, sortiert nach Veränderung absteigend und bei Gleichstand nach ID. `matchedCountries` zählt die Schnittmenge, `excludedCountries` die übrigen Länder der Vereinigung, `meanChange` mittelt nur die gemeinsamen Länder. Erwartet: Der Zeitraum 2018–2025 liefert die gleichen Zahlen wie die Referenzdaten; Länder mit nur einem Wert fehlen in `rows` und sind in `excludedCountries` erfasst.
 
-**F · Gemeinsame Abnahme (Tag 3, zuletzt).** Jeden ersetzten Endpunkt im Browser und mit direkter SQL-Stichprobe prüfen. Danach `ENABLE_EXERCISE_FIXTURES=false` setzen und `npm run test:acceptance` ausführen: alle sechs fachlichen Endpunkte müssen HTTP 200 und `meta.source="postgres"` liefern. Anschließend frischen Compose-Start, Frontend-/API-Hot-Reload und eine neue additive Migration prüfen. `/api/meta` und `/api/health` bleiben Teil des Smoke-Tests.
+**F · Gemeinsame Abnahme (Tag 3, zuletzt).** Jeden ersetzten Endpunkt im Browser und mit direkter SQL-Stichprobe prüfen. Danach `ENABLE_EXERCISE_FIXTURES=false` setzen und `npm run test:acceptance` ausführen: alle sechs fachlichen Endpunkte müssen HTTP 200 und `meta.source="postgres"` liefern. Anschließend frischen Compose-Start und Frontend-/API-Hot-Reload prüfen. `/api/meta` und `/api/health` bleiben Teil des Smoke-Tests.
 
 **Reihenfolge:** A → B → C → D → E → F. Einzelne fertige Repository-Methoden können schon PostgreSQL verwenden, während andere noch im Referenzmodus laufen. Den globalen Fixture-Schalter erst für F deaktivieren; er prüft dann, ob ein Cluster vergessen wurde.
 
@@ -73,7 +73,7 @@ Die Suche in **B** gehört zur Ranking-API. Die Suche in der Tabelle von **E** f
 | T3.1 · 2 h | Zwei Zeitstände pro Land per Self-JOIN verbinden | `trends.repository.ts`, `GET /api/insights/trends` | Nur gemeinsame Länder; Änderung=Endwert−Startwert; Sortierung absteigend |
 | T3.2 · 1 h | Vergleichsmenge und Aggregate korrekt berechnen | gleiche Datei | matched=Anzahl Schnittmenge, excluded=Vereinigung−Schnittmenge, Mittel über dieselben Länder |
 | T3.3 · 1 h | Referenzadapter deaktivieren und Abnahmetest ausführen | `.env`, `npm run test:acceptance` | Alle fachlichen Endpunkte antworten 200 mit source=postgres, keine 501 mehr |
-| T3.4 · 1 h | Frischen Docker-Start und Änderungen prüfen | Compose, SQL-Init, Frontend | Leeres Übungsvolume importiert Daten; Web/API-Änderung wird sichtbar; neue additive Migration läuft einmal |
+| T3.4 · 1 h | Frischen Docker-Start und Änderungen prüfen | Compose, SQL-Init, Frontend | Leeres Testvolume importiert Daten; Web/API-Änderung wird sichtbar |
 | T3.5 · 1 h | Demo und Dokumentation abschließen | README / eigene Projektdokumentation | Team erklärt eine SQL-Abfrage, Datenlücke, Schnittstelle und fachliche Grenze |
 
 **Tagesergebnis:** End-to-End-Datenfluss Browser → API → PostgreSQL; Abfrageergebnisse fachlich geprüft.

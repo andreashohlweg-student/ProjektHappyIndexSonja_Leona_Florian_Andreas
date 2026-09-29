@@ -53,7 +53,7 @@ In der Verlaufsgrafik werden aufeinanderfolgende fehlende Jahreswerte nicht durc
 
 `countries(id PK, name UNIQUE)` → `observations(country_id FK, source_year, ...)`.
 
-Der Primärschlüssel von observations ist `(country_id, source_year)`. Index für Rankings: `(source_year, source_rank, country_id)`. `dataset_metadata` enthält den Herkunftsnachweis; `bootstrap_status` signalisiert den abgeschlossenen Import; `schema_migrations` protokolliert spätere Änderungen.
+Die Datenbank enthält `countries` und `observations`. Der Primärschlüssel von `observations` ist `(country_id, source_year)`. Der Herkunftsnachweis steht in `data/clean/metadata.json` und wird über `/api/meta` ausgeliefert. `/api/health` prüft, ob die Tabelle `observations` importierte Daten enthält.
 
 | SQL | API | Bedeutung |
 | --- | --- | --- |
@@ -75,4 +75,4 @@ Die Faktorbeiträge entstehen aus einem statistischen Modell. Sie werden über J
 
 `python3 scripts/prepare_data.py` verarbeitet den gebündelten Snapshot offline. Das Ergebnis erzeugt sowohl Referenzadapter-Daten als auch SQL-Seeds aus derselben Quelle. Tests importieren beide SQL-Dateien in die PostgreSQL-Engine PGlite und vergleichen alle 2.116 Zeilen mit den JSON-Daten.
 
-Die SQL-Dateien sind für die Erstinitialisierung einer leeren Datenbank gedacht. Sie laufen nicht bei jedem Container-Neustart. Aktualisierungen vorhandener Datenbanken benötigen eine explizite Migration oder einen bewussten lokalen Reset.
+Die SQL-Dateien sind für die Erstinitialisierung einer leeren Datenbank gedacht. Sie laufen nicht bei jedem Container-Neustart. Für die geplanten Leseabfragen müsst ihr das Schema nicht ändern. Wer später Tabellen oder Daten dauerhaft umstellen will, braucht dafür einen eigenen, bewussten Schritt; ein lokaler Reset löscht zuvor gespeicherte Änderungen.

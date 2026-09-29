@@ -21,7 +21,7 @@ docker compose up --build
 | http://localhost:3001/api/openapi.json | Maschinenlesbarer OpenAPI-Vertrag |
 | localhost:5432 | PostgreSQL, Datenbank/User: `happiness`, lokales Passwort: `happiness_local` |
 
-Die vier Dienste sind `web`, `api`, `db`, `migrations`. Bei belegten Ports `.env.example` als `.env` kopieren und `WEB_PORT`, `API_PORT` oder `DB_PORT` ändern. Die internen Verbindungen bleiben unverändert. Eine Änderung von `POSTGRES_PASSWORD` nach der Erstinitialisierung ändert ein bestehendes Datenbankpasswort nicht automatisch.
+Die drei Dienste sind `web`, `api` und `db`. Bei belegten Ports `.env.example` als `.env` kopieren und `WEB_PORT`, `API_PORT` oder `DB_PORT` ändern. Die internen Verbindungen bleiben unverändert. Eine Änderung von `POSTGRES_PASSWORD` nach der Erstinitialisierung ändert ein bestehendes Datenbankpasswort nicht automatisch.
 
 ## Was ist fertig, was ist die Übung?
 
@@ -39,21 +39,23 @@ Unter **http://localhost:3001/api/docs** zeigt Swagger UI alle acht GET-Endpunkt
 
 Die bearbeitbare Spezifikation liegt in [`apps/api/src/http/openapi.yaml`](apps/api/src/http/openapi.yaml). Zusätzlich liefert `/api/openapi.yaml` die Rohdatei. Bei Änderungen am Antwortformat müssen OpenAPI-Datei und TypeScript-Verträge in `packages/contracts/src/index.ts` gemeinsam aktualisiert werden. Der Swagger-Vertrag beschreibt auch den derzeitigen Referenzmodus; nach Umsetzung einer SQL-Aufgabe wechselt `meta.source` für deren Antwort auf `postgres`.
 
-## Hot Reload und SQL-Änderungen
+## Einfache Datenbank, klare Aufgabe
+
+Bei einem frischen Start enthält die Datenbank für die Projektarbeit nur zwei Tabellen: `countries` und `observations`. Die Daten werden beim ersten Start aus `db/init/` importiert. Eure Aufgaben ändern keine Tabellenstruktur; ihr schreibt Leseabfragen in `apps/api/src/repositories/`. Deshalb gibt es keinen Migrationsdienst.
+
+## Änderungen während der Arbeit
 
 | Änderung | Verhalten |
 | --- | --- |
 | `apps/web/src` | Vite aktualisiert die Oberfläche automatisch |
 | `apps/api/src` oder `packages/contracts` | nodemon/tsx startet die API automatisch neu; Polling unterstützt Docker Desktop |
-| Neue `db/migrations/NNN_name.sql` | SQL-Watcher wendet die Migration automatisch in einer Transaktion an |
-| Bereits angewandte Migration ändern | Absichtlicher Fehler; neue nummerierte Datei anlegen |
-| `db/init/*.sql` ändern | Wirkt erst auf eine neue Datenbank; kein automatisches Löschen vorhandener Daten |
+| `db/init/*.sql` ändern | Wirkt nur beim ersten Start mit leerem Datenbankvolume |
 | `package.json`, Lockfile, Docker-/Compose-Konfiguration | `docker compose up --build` erneut ausführen |
 
-Init und Migration sind unterschiedliche Abläufe: Init legt Tabellen und Daten bei einem leeren Volume an. Der Migration-Runner protokolliert anschließend Dateiname und Prüfsumme in `schema_migrations`. Er führt jede neue Datei einmal aus; ein Fehler wird zurückgerollt und im `migrations`-Log angezeigt.
+Für die SQL-Tickets genügt es, die Repository-Dateien zu speichern: Die API startet dann automatisch neu. Der vorhandene Datenbestand bleibt erhalten.
 
 ```sh
-docker compose logs -f api migrations
+docker compose logs -f api db
 docker compose exec db psql -U happiness -d happiness
 docker compose exec api npm run typecheck
 docker compose exec api npm test
@@ -116,8 +118,8 @@ Die E2E-Tests starten lokale API- und Web-Prozesse selbst und prüfen den Refere
 | `apps/api/src/db/` | Pool und Mapper für SQL-Zeilen |
 | `apps/api/src/fixtures/` | Fertiger Referenzadapter für die Vorschau |
 | `packages/contracts/` | Gemeinsame TypeScript-Typen |
-| `db/init/`, `db/migrations/` | Erstimport und spätere SQL-Änderungen |
-| `scripts/prepare_data.py`, `scripts/migrate.ts` | Datenaufbereitung und Migration-Runner |
+| `db/init/` | Tabellen und Daten für den ersten Datenbankstart |
+| `scripts/prepare_data.py` | Datenaufbereitung aus der Originaldatei |
 | `tests/`, `docs/` | Prüfungen, Schnittstellen und Datenherkunft |
 
 Die Startkonfiguration ist für die lokale Projektarbeit vorgesehen. Zugangsdaten sind lokale Entwicklungswerte, Ports werden nur an localhost gebunden.

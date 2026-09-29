@@ -13,8 +13,4 @@ CREATE TABLE observations (
  PRIMARY KEY (country_id, source_year),
  CHECK ((ci_lower IS NULL AND ci_upper IS NULL) OR (ci_lower IS NOT NULL AND ci_upper IS NOT NULL AND ci_lower <= score AND score <= ci_upper))
 );
-CREATE INDEX observations_year_rank_idx ON observations(source_year, source_rank, country_id);
-CREATE TABLE dataset_metadata (id integer PRIMARY KEY CHECK(id=1), metadata jsonb NOT NULL);
-CREATE TABLE schema_migrations (name text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now());
-CREATE TABLE bootstrap_status (id integer PRIMARY KEY CHECK(id=1), ready boolean NOT NULL);
 COMMIT;

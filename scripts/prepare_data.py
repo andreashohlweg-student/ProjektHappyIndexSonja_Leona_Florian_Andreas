@@ -156,18 +156,13 @@ CREATE TABLE observations (
  PRIMARY KEY (country_id, source_year),
  CHECK ((ci_lower IS NULL AND ci_upper IS NULL) OR (ci_lower IS NOT NULL AND ci_upper IS NOT NULL AND ci_lower <= score AND score <= ci_upper))
 );
-CREATE INDEX observations_year_rank_idx ON observations(source_year, source_rank, country_id);
-CREATE TABLE dataset_metadata (id integer PRIMARY KEY CHECK(id=1), metadata jsonb NOT NULL);
-CREATE TABLE schema_migrations (name text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now());
-CREATE TABLE bootstrap_status (id integer PRIMARY KEY CHECK(id=1), ready boolean NOT NULL);
 COMMIT;
 '''
     (ROOT / 'db/init/001_schema.sql').write_text(schema)
     seed = 'BEGIN;\n' + insert('countries',['id','name'],[[r['id'],r['name']] for r in country_rows]) + '\n'
     columns = ['country_id','source_country_name','source_year','source_rank','score','ci_lower','ci_upper',*SQL_FACTORS]
     seed += insert('observations',columns,[[r['countryId'],r['sourceCountryName'],r['year'],r['rank'],r['score'],r['lower'],r['upper'],*r['factors'].values()] for r in records])
-    seed += '\n' + insert('dataset_metadata',['id','metadata'],[[1,json.dumps(metadata,ensure_ascii=False)]])
-    seed += "\nINSERT INTO bootstrap_status VALUES (1, true);\nCOMMIT;\n"
+    seed += '\nCOMMIT;\n'
     (ROOT / 'db/init/002_seed.sql').write_text(seed, encoding='utf-8')
     print(json.dumps({'records':len(records),'countries':len(countries),'years':years,'aliases':alias_count,'sha256':metadata['sourceSha256']},ensure_ascii=False))
 
