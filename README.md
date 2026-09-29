@@ -32,7 +32,7 @@ Die Faktoren erklären im Bericht statistische Unterschiede zwischen Ländern; a
 - SQL-Abfragen in den Repository-Dateien
 - Frontend-Ansichten und API-Aufrufe
 
-Als Muster ist `GET /countries` mit Router, Controller, Fehler-Middleware und einer offenen Repository-Methode vorbereitet. Die SQL-Abfrage in `backend/src/countries/countries.repository.ts` schreibt ihr selbst. Das Frontend ruft den Endpunkt noch nicht auf.
+Der erste geplante Endpunkt ist `GET /rankings?year=2022`. Er soll die Spalten `source_rank`, `country_id`, `source_year` und `score` aus `observations` für das angegebene Jahr liefern, aufsteigend nach `source_rank` sortiert. Router und Controller nehmen den Parameter `year` bereits entgegen. Die parametrisierte SQL-Abfrage in `backend/src/rankings/rankings.repository.ts` schreibt ihr selbst; bis dahin antwortet der Endpunkt mit einem Serverfehler. Das Frontend ruft ihn noch nicht auf.
 
 ```sh
 docker compose down
