@@ -2,7 +2,6 @@ import { pool } from '../db/postgres.js';
 
 export type RankingRow = {
   source_rank: number;
-  country_id: string;
   country_name: string;
   source_year: number;
   score: number;
