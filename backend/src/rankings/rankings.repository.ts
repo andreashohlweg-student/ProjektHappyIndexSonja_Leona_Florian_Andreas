@@ -9,7 +9,7 @@ export type RankingRow = {
 
 export async function getRankingByYear(year: number): Promise<RankingRow[]> {
   const result = await pool.query<RankingRow>(
-    `SELECT o.source_rank, c.name AS country_name,
+    `SELECT o.source_rank, c.name AS country_name, o.ci_lower, o.ci_upper,
             o.source_year, o.score
      FROM observations o
      JOIN countries c ON c.id = o.country_id

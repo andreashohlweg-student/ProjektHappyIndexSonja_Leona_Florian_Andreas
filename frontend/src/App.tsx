@@ -1,26 +1,15 @@
 import { useEffect, useState } from 'react';
-import { AgGridProvider, AgGridReact } from 'ag-grid-react';
-import { AllCommunityModule, type ColDef } from 'ag-grid-community';
+import RankingTable from './components/RankingTable';
 
 type RankingRow = {
   source_rank: number;
   country_name: string;
   source_year: number;
   score: number;
+  confidenceInterval: string;
+  ci_lower: number;
+  ci_upper: number;
 };
-
-
-const columns: ColDef<RankingRow>[] = [
-  { field: 'source_rank', headerName: 'Rang', sortable: true },
-  { field: 'country_name', headerName: 'Land', filter: true, sortable: true },
-  { field: 'source_year', headerName: 'Jahr', sortable: true },
-  { field: 'score', headerName: 'Score', filter: true, sortable: true },
-];
-
-const modules = [AllCommunityModule];
-
-
-
 
 export function App() {
   const [rankings, setRankings] = useState<RankingRow[]>([]);
@@ -32,7 +21,6 @@ export function App() {
   useEffect(() => {
   setLoading(true);
   setError('');
-
   fetch(`/api/rankings?year=${year}`)
     .then(response => {
       if (!response.ok) {
@@ -40,11 +28,13 @@ export function App() {
       }
       return response.json() as Promise<RankingRow[]>;
     })
-    .then(setRankings)
+    .then(rankings => {
+      setRankings(addConfidenceInterval(rankings));
+    })
     .catch(() => setError('Rankings konnten nicht geladen werden'))
     .finally(() => setLoading(false));
 }, [year]);
-  return (
+    return (
    <main>
       <h1>Happiness Atlas – {year}</h1>
 
@@ -70,17 +60,21 @@ export function App() {
 
       {loading && <p>Lade Rankings …</p>}
       {error && <p>{error}</p>}
-
+      
+      
       {!loading && !error && (
-        <AgGridProvider modules={modules}>
-          <div style={{ height: 500 }}>
-            <AgGridReact<RankingRow>
-              rowData={rankings}
-              columnDefs={columns}
-            />
-          </div>
-        </AgGridProvider>
+        <div>
+          <p>Ich bin wenigstens da.</p>
+          <RankingTable rankings={rankings}/>
+        </div>
       )}
     </main>
   );
+}
+
+function addConfidenceInterval(rankings: RankingRow[]) {
+  return rankings.map(ranking => ({
+    ...ranking,
+    confidenceInterval: `${ranking.ci_lower}-${ranking.ci_upper}`,
+  }));
 }
