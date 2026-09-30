@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import RankingTable from './components/RankingTable';
+import Header from './components/Header';
 
 type RankingRow = {
   source_rank: number;
@@ -36,7 +37,7 @@ export function App() {
 }, [year]);
     return (
    <main>
-      <h1>Happiness Atlas – {year}</h1>
+      <Header rankings={rankings} />
 
       <form
         onSubmit={event => {
@@ -64,7 +65,6 @@ export function App() {
       
       {!loading && !error && (
         <div>
-          <p>Ich bin wenigstens da.</p>
           <RankingTable rankings={rankings}/>
         </div>
       )}

@@ -71,7 +71,7 @@ export default function RankingTable({ rankings }: RankingTableProps) {
 
   return (
     <div>
-      <p>Ranking · {rankings.length} Beobachtungen</p>
+      <p>Ranking · {rankings.length} Erhebungen</p>
 
       <AgGridProvider modules={modules}>
         <AgGridReact<RankingRow>
