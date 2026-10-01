@@ -23,8 +23,8 @@ export default function Column({
           style={{ height: `${barHeightPercent}%` }}
         />
       </div>
-      <strong className="flex flex-col items-center text-xs font-medium leading-tight sm:flex-row">
-        <span>{min}–</span><span>&lt;{min + 1}</span>
+      <strong className="whitespace-nowrap text-xs font-medium leading-tight">
+        {min}–{min + 1}
       </strong>
     </div>
   );

@@ -49,7 +49,7 @@ export function App() {
             <h2 className="text-lg font-semibold">Wie verteilen sich die Lebensbewertungen?</h2>
             <p className="mt-1 text-sm text-slate-600">
               Jeder Balken zeigt, wie viele Länder und Gebiete in einem Score-Bereich liegen.
-              6–&lt;7 bedeutet: mindestens 6, aber weniger als 7. Jedes Land zählt dabei einmal.
+              Die Beschriftung 6–7 umfasst Scores ab 6 bis unter 7. Jedes Land zählt dabei einmal.
             </p>
             {!loading && !error && rankings.length > 0 && (
               <div className="mt-5"><Distribution rankings={rankings} /></div>
