@@ -32,12 +32,12 @@ export default function Header({ rankings, year, loading, error }: HeaderProps) 
         <p className="text-sm font-medium text-slate-500">World Happiness Report · Quellenjahr {year}</p>
         <h1 className="text-3xl font-semibold tracking-tight">Lebenszufriedenheit im internationalen Vergleich</h1>
 
-        <p className="max-w-2xl text-slate-600">
+        <p className="text-slate-600">
           Die Grundlage sind Befragungen des Gallup World Poll. Menschen bewerten ihr Leben
           insgesamt auf einer Skala von 0 (schlechtestmöglich) bis 10 (bestmöglich).
           Der Score eines Landes ist der Durchschnitt dieser Antworten.
         </p>
-        <p className="max-w-2xl text-slate-600">
+        <p className="text-slate-600">
           Wähle ein Quellenjahr, um die Verteilung der Scores und die Rangfolge der Länder zu sehen.
         </p>
         <a className="inline-block text-sm text-slate-600 underline underline-offset-2" href="https://www.worldhappiness.report/data-sharing/">
