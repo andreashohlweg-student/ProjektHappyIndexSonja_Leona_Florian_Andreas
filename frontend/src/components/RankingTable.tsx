@@ -34,7 +34,7 @@ const columns: ColDef<RankingRow>[] = [
   {
     field: 'country_name',
     headerName: 'Land/Gebiet',
-    filter: true,
+    filter: false,
     sortable: true,
     flex: 2,
     minWidth: 160,
