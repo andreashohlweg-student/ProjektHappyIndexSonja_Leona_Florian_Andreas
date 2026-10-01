@@ -84,7 +84,7 @@ export default function RankingTable({ rankings }: RankingTableProps) {
       <div className="space-y-1">
         <h2 className="text-lg font-semibold">Ranking der Länder und Gebiete</h2>
         <p className="text-sm text-slate-600">
-          Rang 1 hat den höchsten Score. Du kannst die Spalten sortieren und beim Ländernamen filtern.
+          Rang 1 hat den höchsten Score. Du kannst die Spalten sortieren.
         </p>
       </div>
 
@@ -111,10 +111,9 @@ export default function RankingTable({ rankings }: RankingTableProps) {
       </AgGridProvider>
 
       <p className="text-sm text-slate-600">
-        Das 95-%-Intervall zeigt die Unsicherheit des geschätzten Landesdurchschnitts.
-        Je schmaler es ist, desto präziser ist die Schätzung. Es beschreibt nicht,
-        wie unterschiedlich einzelne Menschen geantwortet haben. Ein Strich bedeutet,
-        dass für dieses Jahr keine Intervallgrenzen vorliegen.
+        Ein Strich bedeutet, dass für dieses Jahr keine Intervallgrenzen vorliegen. Im Abschnitt{' '}
+        <a className="underline underline-offset-2" href="#unsicherheit">Unsicherheit</a>{' '}
+        kannst du für ein Land die Rangplätze mit überlappenden Intervallen ansehen.
       </p>
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">

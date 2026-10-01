@@ -27,7 +27,7 @@ export default function Header({ rankings, year, loading, error }: HeaderProps) 
   const maxScore = scores.length > 0 ? Math.max(...scores) : null;
 
   return (
-    <header className="flex flex-col gap-6">
+    <header id="ueberblick" className="scroll-mt-32 flex flex-col gap-6">
       <div className="space-y-3">
         <p className="text-sm font-medium text-slate-500">
           World Happiness Report{year !== null && ` · Quellenjahr ${year}`}

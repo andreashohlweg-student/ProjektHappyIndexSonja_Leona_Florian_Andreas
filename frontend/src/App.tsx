@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import RankingTable from './components/RankingTable';
 import Header from './components/Header';
 import Distribution from './components/Distribution';
+import Uncertainty from './components/Uncertainty';
 import { formatScore } from './formatScore';
 
 type ApiRankingRow = {
@@ -84,8 +85,18 @@ export function App() {
           error={Boolean(yearsError || rankingsError)}
         />
 
+        <nav aria-label="Auf dieser Seite" className="sticky top-0 z-10 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white/95 p-3 text-sm shadow-sm backdrop-blur">
+          <span className="mr-2 font-semibold text-slate-700">Auf dieser Seite</span>
+          <a className="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100" href="#ueberblick">Überblick</a>
+          <a className="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100" href="#jahr">Jahr wählen</a>
+          <a className="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100" href="#verteilung">Verteilung</a>
+          <a className="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100" href="#ranking">Ranking</a>
+          <a className="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100" href="#unsicherheit">Unsicherheit</a>
+        </nav>
+
         <form
-          className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+          id="jahr"
+          className="scroll-mt-32 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
           onSubmit={event => {
             event.preventDefault();
             const selectedYear = Number(yearInput);
@@ -137,7 +148,7 @@ export function App() {
           )}
         </form>
 
-        <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section id="verteilung" className="scroll-mt-32 min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold">Wie verteilen sich die Lebensbewertungen?</h2>
           <p className="mt-1 text-sm text-slate-600">
             Jeder Balken zeigt, wie viele Länder und Gebiete in einem Score-Bereich liegen.
@@ -160,11 +171,25 @@ export function App() {
           )}
         </section>
 
-        {!rankingsLoading && !rankingsError && rankings.length > 0 && (
-          <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <RankingTable rankings={rankings} />
-          </section>
-        )}
+        <section id="ranking" className="scroll-mt-32 min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          {!rankingsLoading && !rankingsError && rankings.length > 0
+            ? <RankingTable rankings={rankings} />
+            : <>
+                <h2 className="text-lg font-semibold">Ranking der Länder und Gebiete</h2>
+                <p className="mt-2 text-slate-600">
+                  {rankingsLoading ? 'Das Ranking wird geladen …' : 'Das Ranking ist für dieses Jahr derzeit nicht verfügbar.'}
+                </p>
+              </>}
+        </section>
+
+        <section id="unsicherheit" className="scroll-mt-32 min-w-0 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold">Wie sicher ist ein Länder-Score?</h2>
+          {!rankingsLoading && !rankingsError && year !== null && rankings.length > 0
+            ? <Uncertainty key={year} rankings={rankings} year={year} />
+            : <p className="mt-2 text-slate-600">
+                {rankingsLoading ? 'Die Daten zur Schätzunsicherheit werden geladen …' : 'Die Erklärung ist verfügbar, sobald ein Quellenjahr mit Daten geladen wurde.'}
+              </p>}
+        </section>
       </div>
     </main>
   );
