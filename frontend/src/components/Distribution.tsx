@@ -21,7 +21,7 @@ export default function Distribution({ rankings }: DistributionProps) {
   const highestValue = Math.max(...counts);
 
   return (
-    <div className="grid aspect-[3/1] min-h-44 max-h-72 w-full grid-cols-7 gap-2">
+    <div className="grid aspect-3/1 min-h-44 max-h-72 w-full grid-cols-7 gap-2">
       {ranges.map((min, index) => (
         <Column
           key={min}
