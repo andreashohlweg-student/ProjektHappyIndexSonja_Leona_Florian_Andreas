@@ -5,6 +5,7 @@ import {
   type ColDef,
   type GridApi,
 } from 'ag-grid-community';
+import { formatScore } from '../formatScore';
 
 type RankingRow = {
   source_rank: number;
@@ -12,8 +13,8 @@ type RankingRow = {
   source_year: number;
   score: number;
   confidenceInterval: string;
-  ci_lower: number;
-  ci_upper: number;
+  ci_lower: number | null;
+  ci_upper: number | null;
 };
 
 type RankingTableProps = {
@@ -27,22 +28,31 @@ const columns: ColDef<RankingRow>[] = [
     field: 'source_rank',
     headerName: 'Rang',
     sortable: true,
+    flex: 1,
+    minWidth: 90,
   },
   {
     field: 'country_name',
     headerName: 'Land/Gebiet',
     filter: true,
     sortable: true,
+    flex: 2,
+    minWidth: 160,
   },
   {
     field: 'score',
     headerName: 'Score',
     sortable: true,
+    flex: 1,
+    minWidth: 110,
+    valueFormatter: params => formatScore(params.value),
   },
   {
     field: 'confidenceInterval',
     headerName: '95-%-Intervall',
     sortable: true,
+    flex: 1.5,
+    minWidth: 160,
   },
 ];
 
@@ -70,8 +80,13 @@ export default function RankingTable({ rankings }: RankingTableProps) {
   }
 
   return (
-    <div>
-      <p>Ranking · {rankings.length} Erhebungen</p>
+    <div className="flex flex-col gap-4">
+      <div className="space-y-1">
+        <h2 className="text-lg font-semibold">Ranking der Länder und Gebiete</h2>
+        <p className="text-sm text-slate-600">
+          Rang 1 hat den höchsten Score. Du kannst die Spalten sortieren und beim Ländernamen filtern.
+        </p>
+      </div>
 
       <AgGridProvider modules={modules}>
         <AgGridReact<RankingRow>
@@ -95,21 +110,30 @@ export default function RankingTable({ rankings }: RankingTableProps) {
         />
       </AgGridProvider>
 
-      <div>
+      <p className="text-sm text-slate-600">
+        Das 95-%-Intervall zeigt die Unsicherheit des geschätzten Landesdurchschnitts.
+        Je schmaler es ist, desto präziser ist die Schätzung. Es beschreibt nicht,
+        wie unterschiedlich einzelne Menschen geantwortet haben. Ein Strich bedeutet,
+        dass für dieses Jahr keine Intervallgrenzen vorliegen.
+      </p>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
         <button
           type="button"
+          className="rounded-md border border-slate-300 px-3 py-2 disabled:opacity-40"
           onClick={previousPage}
           disabled={currentPage === 0}
         >
           Zurück
         </button>
 
-        <span>
+        <span className="text-slate-600">
           Seite {currentPage + 1} von {totalPages}
         </span>
 
         <button
           type="button"
+          className="rounded-md border border-slate-300 px-3 py-2 disabled:opacity-40"
           onClick={nextPage}
           disabled={currentPage + 1 >= totalPages}
         >

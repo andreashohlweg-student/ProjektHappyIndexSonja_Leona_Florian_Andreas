@@ -7,9 +7,11 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "ag-grid-react": "^36.2.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
