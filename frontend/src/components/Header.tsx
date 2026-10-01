@@ -13,7 +13,7 @@ type RankingRow = {
 
 type HeaderProps = {
   rankings: RankingRow[];
-  year: number;
+  year: number | null;
   loading: boolean;
   error: boolean;
 };
@@ -29,7 +29,9 @@ export default function Header({ rankings, year, loading, error }: HeaderProps) 
   return (
     <header className="flex flex-col gap-6">
       <div className="space-y-3">
-        <p className="text-sm font-medium text-slate-500">World Happiness Report · Quellenjahr {year}</p>
+        <p className="text-sm font-medium text-slate-500">
+          World Happiness Report{year !== null && ` · Quellenjahr ${year}`}
+        </p>
         <h1 className="text-3xl font-semibold tracking-tight">Lebenszufriedenheit im internationalen Vergleich</h1>
 
         <p className="text-slate-600">
@@ -48,8 +50,8 @@ export default function Header({ rankings, year, loading, error }: HeaderProps) 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card
           title="Länder im Vergleich"
-          value={loading || error ? '–' : rankings.length}
-          description={`Länder und Gebiete mit Daten für ${year}`}
+          value={loading || error || year === null ? '–' : rankings.length}
+          description={year === null ? 'Wähle ein verfügbares Quellenjahr' : `Länder und Gebiete mit Daten für ${year}`}
         />
 
         <Card
