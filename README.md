@@ -30,18 +30,24 @@ Voraussetzung ist Docker mit Docker Compose:
 ```sh
 git clone https://github.com/andreashohlweg-student/ProjektHappyIndexSonja_Leona_Florian_Andreas.git
 cd ProjektHappyIndexSonja_Leona_Florian_Andreas
+cp .env.example .env
+```
+
+Trage in `.env` freie lokale Ports und die gewünschten Datenbank-Zugangsdaten ein. Starte danach die Container:
+
+```sh
 docker compose up --build
 ```
 
-Wer das Repository bereits lokal hat, führt nur den letzten Befehl im Projektordner aus.
+Wer das Repository bereits lokal und eine ausgefüllte `.env` hat, führt nur den letzten Befehl im Projektordner aus. Die `.env` wird nicht ins Repository eingecheckt. [.env.example](.env.example) zeigt lediglich, welche Schlüssel benötigt werden.
 
 | Dienst | Adresse auf dem eigenen Rechner |
 | --- | --- |
-| Dashboard | <http://localhost:5173> |
-| Backend-API | <http://localhost:3000> |
-| PostgreSQL | `localhost:5432` |
+| Dashboard | `http://localhost:<WEB_PORT>` |
+| Backend-API | `http://localhost:<API_PORT>` |
+| PostgreSQL | `localhost:<DB_PORT>` |
 
-Die Standardports und das lokale Datenbankpasswort stehen in [.env.example](.env.example). Wenn ein Port bereits belegt ist, die Datei als `.env` kopieren und `WEB_PORT`, `API_PORT` oder `DB_PORT` anpassen. Das Frontend leitet Aufrufe unter `/api` an das Backend weiter; direkt am Backend heißen die Routen `/years` und `/rankings`.
+Die Werte für `WEB_PORT`, `API_PORT` und `DB_PORT` stehen in deiner lokalen `.env`. Du kannst dafür beispielsweise 5173, 3000 und 5432 wählen, sofern diese Ports frei sind. Diese Variablen legen die Ports auf deinem Rechner fest; die Verbindungen zwischen den Containern regelt `compose.yaml`. Das Frontend leitet Aufrufe unter `/api` an das Backend weiter; direkt am Backend heißen die Routen `/years` und `/rankings`.
 
 Änderungen unter `frontend/src` und `backend/src` werden in die Entwicklungscontainer eingebunden. Bei Änderungen an Paketen oder Dockerfiles die Images mit `docker compose up --build` neu bauen.
 
@@ -63,8 +69,8 @@ Das Datenbank-Volume bleibt dabei erhalten. `docker compose down -v` **löscht**
 Zum Ausprobieren:
 
 ```sh
-curl http://localhost:3000/years
-curl 'http://localhost:3000/rankings?year=2022'
+curl "http://$(docker compose port backend 3000)/years"
+curl "http://$(docker compose port backend 3000)/rankings?year=2022"
 ```
 
 Ein Ranking-Eintrag enthält `source_rank`, `country_name`, `source_year`, `score`, `ci_lower` und `ci_upper`. Die Intervallgrenzen können `null` sein, wenn sie für ein Quellenjahr nicht vorliegen.
@@ -78,12 +84,14 @@ In pgAdmin einen Server mit diesen lokalen Verbindungsdaten registrieren:
 | Feld | Wert |
 | --- | --- |
 | Host | `127.0.0.1` |
-| Port | `5432` oder der Wert von `DB_PORT` in `.env` |
-| Datenbank | `happiness` |
-| Benutzer | `happiness` |
-| Passwort | `happiness_local` oder der Wert von `POSTGRES_PASSWORD` in `.env` |
+| Port | `DB_PORT` aus `.env` |
+| Datenbank | `POSTGRES_DB` aus `.env` |
+| Benutzer | `POSTGRES_USER` aus `.env` |
+| Passwort | `POSTGRES_PASSWORD` aus `.env` |
 
 Die Datenbank ist in `compose.yaml` nur an die lokale Rechneradresse gebunden. pgAdmin kann deshalb auf demselben Rechner außerhalb des Containers laufen.
+
+`POSTGRES_DB`, `POSTGRES_USER` und `POSTGRES_PASSWORD` werden beim ersten Anlegen des Datenbank-Volumes verwendet. Änderungen dieser Werte in `.env` passen eine bereits initialisierte Datenbank nicht nachträglich an.
 
 ## Daten richtig lesen
 
