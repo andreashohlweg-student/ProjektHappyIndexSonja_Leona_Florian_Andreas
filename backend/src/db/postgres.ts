@@ -7,3 +7,7 @@ export const pool = new Pool({
   user: process.env.POSTGRES_USER ?? 'happiness',
   password: process.env.POSTGRES_PASSWORD ?? 'happiness_local',
 });
+
+pool.on('error', error => {
+  console.error('Datenbankverbindung unterbrochen:', error);
+});

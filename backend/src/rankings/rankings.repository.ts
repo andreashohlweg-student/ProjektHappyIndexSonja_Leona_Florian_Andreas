@@ -5,6 +5,8 @@ export type RankingRow = {
   country_name: string;
   source_year: number;
   score: number;
+  ci_lower: number | null;
+  ci_upper: number | null;
 };
 
 export async function getRankingByYear(year: number): Promise<RankingRow[]> {
@@ -20,5 +22,3 @@ export async function getRankingByYear(year: number): Promise<RankingRow[]> {
 
   return result.rows;
 }
-
-

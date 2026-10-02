@@ -1,6 +1,6 @@
 # Happiness Atlas
 
-Ein kleiner Startpunkt für eure Projektarbeit, aufgebaut wie das [Express-Demo](https://github.com/SYN-WEB-25-12/express-demo): React-Frontend, Express-Backend und PostgreSQL. Die Aufgabenstellung steht in [AUFGABENSTELLUNG.txt](AUFGABENSTELLUNG.txt).
+Ein kleiner Startpunkt für eure Projektarbeit, aufgebaut wie das [Express-Demo](https://github.com/SYN-WEB-25-12/express-demo): React-Frontend, Express-Backend und PostgreSQL. Die Aufgabenstellung steht in [AUFGABENSTELLUNG.txt](docs/AUFGABENSTELLUNG.txt).
 
 ## Starten
 
@@ -26,13 +26,12 @@ Eine Zeile in `observations` gehört zu einem Land und einem `source_year`. `cou
 
 Die Faktoren erklären im Bericht statistische Unterschiede zwischen Ländern; aus einem Beitrag lässt sich keine Ursache für das Glück eines einzelnen Landes ableiten. Der Score und der Rang beruhen auf den Antworten der Befragten, nicht auf einer Summe selbst gewählter Faktoren. Mehr zur Messung steht in [Kapitel 2 des Berichts](https://www.worldhappiness.report/ed/2026/international-evidence-on-happiness-and-social-media/).
 
-## Was ihr selbst baut
+## Aktuelle Endpunkte
 
-- Weitere Express-Routen und ihre Antwortformate
-- SQL-Abfragen in den Repository-Dateien
-- Frontend-Ansichten und API-Aufrufe
+- `GET /years` liefert die Quellenjahre mit Daten als absteigend sortierte Zahlenliste, zum Beispiel `[2025, 2024, …]`.
+- `GET /rankings?year=2022` liefert Rang, Land, Quellenjahr, Score und die verfügbaren Intervallgrenzen für das angegebene Jahr. Für ein Jahr ohne Daten kommt eine leere Liste zurück.
 
-Der erste geplante Endpunkt ist `GET /rankings?year=2022`. Er soll die Spalten `source_rank`, `country_id`, `source_year` und `score` aus `observations` für das angegebene Jahr liefern, aufsteigend nach `source_rank` sortiert. Router und Controller nehmen den Parameter `year` bereits entgegen. Die parametrisierte SQL-Abfrage in `backend/src/rankings/rankings.repository.ts` schreibt ihr selbst; bis dahin antwortet der Endpunkt mit einem Serverfehler. Das Frontend ruft ihn noch nicht auf.
+Ungültige Jahresparameter erhalten HTTP 400, unbekannte Routen HTTP 404 und unerwartete Serverfehler HTTP 500. Die Antworten enthalten jeweils ein `error`-Feld. Das Frontend zeigt Lade- und Fehlerzustände an und bietet bei fehlgeschlagenen Abfragen einen erneuten Versuch an.
 
 ```sh
 docker compose down
