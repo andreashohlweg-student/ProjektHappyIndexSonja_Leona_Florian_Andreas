@@ -259,21 +259,21 @@ async function getJson(url: string, signal: AbortSignal): Promise<unknown> {
     throw new Error('Keine Verbindung zum Backend.');
   }
 
-  if (response.status >= 500) {
-    throw new Error('Der Server ist derzeit nicht verfügbar.');
-  }
-
   let data: unknown;
   try {
     data = await response.json();
   } catch {
-    throw new Error('Der Server hat keine gültige Antwort geliefert.');
+    throw new Error(response.status >= 500
+      ? 'Der Server ist derzeit nicht verfügbar.'
+      : 'Der Server hat keine gültige Antwort geliefert.');
   }
 
   if (!response.ok) {
     const message = typeof data === 'object' && data !== null && 'error' in data && typeof data.error === 'string'
       ? data.error
-      : `Anfrage fehlgeschlagen (HTTP ${response.status}).`;
+      : response.status >= 500
+        ? 'Der Server ist derzeit nicht verfügbar.'
+        : `Anfrage fehlgeschlagen (HTTP ${response.status}).`;
     throw new Error(message);
   }
 

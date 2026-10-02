@@ -31,7 +31,7 @@ Die Faktoren erklären im Bericht statistische Unterschiede zwischen Ländern; a
 - `GET /years` liefert die Quellenjahre mit Daten als absteigend sortierte Zahlenliste, zum Beispiel `[2025, 2024, …]`.
 - `GET /rankings?year=2022` liefert Rang, Land, Quellenjahr, Score und die verfügbaren Intervallgrenzen für das angegebene Jahr. Für ein Jahr ohne Daten kommt eine leere Liste zurück.
 
-Ungültige Jahresparameter erhalten HTTP 400, unbekannte Routen HTTP 404 und unerwartete Serverfehler HTTP 500. Die Antworten enthalten jeweils ein `error`-Feld. Das Frontend zeigt Lade- und Fehlerzustände an und bietet bei fehlgeschlagenen Abfragen einen erneuten Versuch an.
+Ungültige Jahresparameter erhalten HTTP 400, unbekannte Routen HTTP 404 und eine nicht erreichbare Datenbank HTTP 503. Unerwartete Serverfehler erhalten HTTP 500. Die Antworten enthalten jeweils ein `error`-Feld. Das Frontend zeigt Lade- und Fehlerzustände an und bietet bei fehlgeschlagenen Abfragen einen erneuten Versuch an.
 
 ```sh
 docker compose down

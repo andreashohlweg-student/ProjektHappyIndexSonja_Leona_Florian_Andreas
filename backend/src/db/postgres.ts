@@ -6,6 +6,7 @@ export const pool = new Pool({
   database: process.env.POSTGRES_DB ?? 'happiness',
   user: process.env.POSTGRES_USER ?? 'happiness',
   password: process.env.POSTGRES_PASSWORD ?? 'happiness_local',
+  connectionTimeoutMillis: 5000,
 });
 
 pool.on('error', error => {
